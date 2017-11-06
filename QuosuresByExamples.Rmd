@@ -124,7 +124,7 @@ q1 <- f1(a-b-c-d)
 rlang::f_text(q1)
 ```
 The text value of the quosure is the expression input to `enquo` but prettified a bit by adding whitespace around the dashes.
-  
+   
 Note that the best practice for using binary operator like `-` is to put whitespace on both sides of the operator. We didn't do that here on purpose... we want to write a part number exactly in the way the "documentation" for our made up part numbering system says we should.
 
 One of the things you can do with a quosure is evaluate it by using the eval_tidy function from the rlang package. We're using package name prefixes in the examples in this tutorial just so that it is easier to see where functions are coming from.
