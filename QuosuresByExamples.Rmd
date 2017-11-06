@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 >Scrabble scene  
 
 ##Introduction
-
+ddddd
 This is a tutorial about quosures. Quosures are objects that are the basis for non-standard evaluation of expressions in the tidyverse.
 
 It focuses on the behaviour, *i.e.* the mechanics of how they work, and the structure of quosures, not necessarily particular applications of quosures. However it does include an example of applying quosures to a function that uses non-standard evaluation to build a part number.
