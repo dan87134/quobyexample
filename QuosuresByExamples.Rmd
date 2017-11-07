@@ -18,17 +18,47 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ##Introduction
 
-This is a tutorial about quosures. Quosures are objects that are the basis for non-standard evaluation of expressions in the tidyverse.
+This is a tutorial about quosures and the some of the basics of using them. Quosures are objects that are the basis for non-standard evaluation of expressions in the tidyverse.
 
-It focuses on the behaviour, *i.e.* the mechanics of how they work, and the structure of quosures, not necessarily particular applications of quosures. However it does include an example of applying quosures to a function that uses non-standard evaluation to build a part number.
+You may have never heard of quosures before but if you have used packages like dplyr and many others you are using quosures under the covers. It's quosures that make the convienent and compact syntax of a function like dplyr::select possible:
 
-By the end of this tutorial you should be able to think out of the box about some ways to make use of quosures and be familiar with some of the idioms of their use.
+```{r dplyr}
+t1 <- tibble::tribble(
+	~col1, ~col2, ~col3,
+	1, 2, 3,
+	4, 5, 6,
+	7, 8, 9
+)
+# you just specify the columns you want with literal names
+dplyr::select(t1, first=col2, last=col3)
+
+```
+
+`select` certainly a nicer syntax than something like:
+
+```{r subset}
+t1 <- data.frame(
+	col1 = 1:3,
+	col2 = 2:4,
+	col3 = 3:5
+)
+t2 <- subset(t1, T, select = c(col2, col3))
+colnames(t2) <- c("first", "last")
+t2
+````
+
+This tutorial focuses on the behaviour, *i.e.* the mechanics of how quosures work, and the structure of quosures, not necessarily particular applications of quosures.
+
+
+However it does include an example of applying quosures to a function that uses non-standard evaluation to build a part number. That, at first glance, might not seem like much but it lets part numbers use their native syntax... you'll see that shortly.
+
+By the end of this tutorial you should be able to think out of the box about some ways to make use of quosures to make function that has a clean and simple syntax for input, similar to the way that dplyr::select does.
 
 But before we dive into the details of quosures we need to get a big picture of why we care about them and non-standard evaluation.
 
 ##Big Picture
 
-Most of the time in R expressions are evaluated and replaced with the value that the evaluation produces. This is what R calls standard evaluation. Here is an example of a function takes `exp` as it's sole argument and then just returns it. However does not return literally what is passed into it... it returns the result of R's standard evaluation of what is passed into it :
+Most of the time in R expressions are evaluated and replaced with the value that the evaluation produces. This is what R calls standard evaluation. Here is an example of a function takes `exp` as it's sole argument and then just returns it. However it does not return literally what is passed into it... it returns the result of R's standard evaluation of what is passed into it :
 
 
 ```{r standard-evaluation}
@@ -40,7 +70,7 @@ f1 <- function(exp){
 f1(a-b)
 ```
 
-So calling f1 in this example produces, as you might expect, `20`. But f1 didn't do much to return that result. It depended on R's standard evaluation of `a - b` and returned the result that produced.
+So calling f1 in this example produces, as you might expect, `20`. But f1 didn't do much to compute that result. It depended on R's standard evaluation of `a - b` and returned the result that produced.
 
 But what if you wanted f1(a-b) to produce the string "21-1", that is the values of `a` and `b` concatonated with a dash? You might want to do this if you wanted a function that produced part numbers in a significant part numbering system.
 
@@ -56,8 +86,6 @@ make_part_number <- function(expr) {
 	"21-1"
 }
 ```
-		    
-		   
 </div>
 
 
@@ -97,7 +125,7 @@ The first part number function we looked at, `make_part_number`, is an example o
 
 There is a computer science term for what `make_part_number` is doing. `make_part_number`'s argument is an expression from a DSL, or domain specific langauge. All DSL means is that that functions use formats and operations that the user of the functions is familiar with regardless of how difficult the implementation will be for the developer :-)
 
-Now the users of the make_part_number function might be in a purchasing department and just be poking at part data from an R Studio console window. These users work with part numbers all day long, every day, and asking them translate dashes into commas and a little white spaces is just asking them to make errors.
+Now the users of the make_part_number function might be in a purchasing department and just be poking at part data from an R Studio console window. These users work with part numbers all day long, every day, and asking them translate dashes into commas and a little white space is just asking them to make errors.
 
 The user also might be a developer using make_part_number in a package that will be the foundation for a system for tracking the statisics of part usage. Even here having part number arguments that look like the ones in the documentation the developer will be referencing is also a win in terms of minimizing errors.
 
@@ -111,7 +139,7 @@ Now that we had a quick look at the big picture and motivation for quosures let'
 
 ##Quoting
 
-The concept of quoting in programming refers to taking an expression used in a program and turning into a string-like object so that it can be directly analyzed in a program rather than being evaluated.
+The concept of quoting in programming refers to taking an expression used in a program and turning into it a string-like object so that it can be directly analyzed in a program rather than being evaluated.
 
 R provides a number of ways to quote an expression. In the tidyverse the function `enquo` is used to quote an expression which is used as an argument to a function. In this tutorial we will focus on `enquo` because we will need it for the `make_part_number` function.
 
@@ -122,10 +150,13 @@ The rlang package provides a number of functions that let us easily tease apart 
 As an example of a simple one of these functions let's make a quosure and use the `f_text` function to get its text value. :
 
 ```{r quosure1}
+# function that makes a quosure
 f1 <- function(expr) {
   rlang::enquo(expr)
 }
+# make the quosure
 q1 <- f1(a-b-c-d)
+# now get as text what was quoted
 rlang::f_text(q1)
 ```
 The text value of the quosure is the expression input to `enquo` but prettified a bit by adding whitespace around the dashes.
@@ -135,14 +166,18 @@ Note that the best practice for using binary operator like `-` is to put whitesp
 One of the things you can do with a quosure is evaluate it by using the eval_tidy function from the rlang package. We're using package name prefixes in the examples in this tutorial just so that it is easier to see where functions are coming from.
 
 ```{r quosure2}
+# assign some values to some varibles
 a <- 10
 b <- 5
 c <- 3
 d <- 2
+# this is the same function as in the previous example
 f1 <- function(expr) {
 	rlang::enquo(expr)
 }
+# make the quosure
 q1 <- f1(a-b-c-d)
+# evaluate the quosure, that is compute the value of a-b-c-d
 rlang::eval_tidy(q1)
 ```
 
@@ -164,11 +199,11 @@ It turns out that our `make_part_number` function will not have to evaluate a qu
 
 Interpretation is the process of taking an expression, like a-b-c-d, and breaking it down in to pieces that can be computed and then putting those computed pieces back together to get the final result.
 
-The preceding definition probably is not all clear but as we go though this part of the tutorial it will make sense.
+The preceding definition probably isn't all clear but as we go though this part of the tutorial it will make sense.
 
 First of all you might ask the question "Why do we have to break down anything?". Why can't you just compute `a-b-c-d` and be done with it.
 
-There are a couple of reasons for breaking things down. Some expressions are much more complicated than `a-b-c-d` there is no reason to think that they could be evaluated in a single gulp. But another reason is an artifact of how almost all modern computers work. In a nutshell a computer has instructions built into to it to compute most binary operations. Here is some psuedo assembly code that does subtraction:
+There are a couple of reasons for breaking things down. Some expressions are much more complicated than `a-b-c-d` and there is no reason to think that they could be evaluated in a single gulp. But another reason is an artifact of how almost all modern computers work. In a nutshell a computer has instructions built into to it to compute most binary operations. Here is some psuedo assembly code that does subtraction:
 
 ```
 sub R2, R1
@@ -201,7 +236,7 @@ R6 <- R3 - R2 - R1
 
 It turns out, as luck would have it, that a quosure will do at least part of that breakdown for you.
 
-A closure can be broken up into a head and a tail. The head contains an operation or a function and the tail is a list of arguments for that operation or function. Let's use some of the functions from `rlang` see how a `quosure` for `a-b-c-d` is broken down.
+A quosure can be broken up into a head and a tail. The head contains an operation or a function and the tail is a list of arguments for that operation or function. Let's use some of the functions from `rlang` see how the `quosure` for `a-b-c-d` is broken down.
 
 <div style=display:none>
 ```{r clr6}
@@ -211,26 +246,22 @@ rm(list = ls())
 
 
 ```{r breakdown1}
-a <- 10
-b <- 5
-c <- 3
-d <- 2
+# here is that function that makes a closure again
 f1 <- function(expr) {
 	rlang::enquo(expr)
 }
 q1 <- f1(a-b-c-d)
-# get the operation/function
+# get the operation/function of q1
 rlang::lang_head(q1)
-# get the arguments
+# get the arguments of q1
 rlang::lang_tail(q1)
 
 ```
-
 From the head you can see that it is a `-` operation being used. A `-` operation should have exactly 2 arguments.
 
 And you can see that the tail has exactly 2 argruments in it. Not only does it have exactly two arguments it looks like quosures have pretty good idea of how breakdown an expression!
 
-The first argument is a pruned off version of the `a-b-c-d` and the second it what was pruned off of it.
+The first argument is a pruned off version of the `a-b-c-d` and the second is what was pruned off of it.
 
 The second argument `d` is just a solo symbol. We can evaluate that like this:
 
@@ -280,18 +311,19 @@ f1 <- function(expr) {
 }
 q1 <- f1(a-b-c-d)
 arg1 <- rlang::lang_tail(q1)[[1]]
-# this is the first argument
+# this is the first argument, that is the first element in the tail
 arg1
 # now make a quosure out of it
 q2 <- rlang::expr_interp(arg1)
 # now get the second argument of the tail of the q2 quosure
 arg2 <- rlang::lang_tail(q2)[[2]]
+# this will show that arg2 is c
 arg2
 # and evaluate it
 rlang::eval_tidy(arg2)
 ```
 
-And we can see now that `expr_interp` was able to make a quosure out of the first argument of `q1`'s tail. Then we were able to prune off the 'c' from that expression and evaluate it. The result of the evaluation was what we expected, a 3. 
+And we can see now that `expr_interp` was able to make a quosure out of the first argument of `q1`'s tail. Then we were able to prune off the 'c' from that expression and evaluate it. The result of the evaluation was what we expected, 3, the value that was assigned to c. 
 
 With a little recursion we can prune off all of the part number attributes individually and evaluate them. Will see that shortly when we make the `make_part_number` function.
 
@@ -301,7 +333,7 @@ Now we know just enough about quosures to make the `make_part_number` function. 
 
 Below is the make_part_number function. 
 
-The one "trick" that `make_part_number` is using that we haven't looked at yet is that only language objects have a head and tail. The only thing you can do with `quosures` that are not language objects evaluate them. The `rlang` function `is_lang` will tell you if a quosure is a language object or not.
+The one "trick" that `make_part_number` is using that we haven't looked at yet is that only language objects have a head and tail. The only thing you can do with `quosures` that are not language objects is to evaluate them. The `rlang` function `is_lang` will tell you if a quosure is a language object or not.
 
 Comments are scattered thoughout... exercise for the student to understand how `make_part_number` works. :-) 
 
@@ -356,23 +388,25 @@ c <- b + d
 d <- 7
 make_part_number(a-b-c-d)
 ```
+... and that works too.
 
-... and we can even do some computations in line in the part number itself:
+And we can even do some computations in line in the part number itself:
 ```{r mpn4}
 a <- 10
 b <- 9
 c <- 4
 d <- 7
-make_part_number(sum(b,c)-b-c-b*c)
+make_part_number(a-b-c-b*c)
 ```
 
-It may seem to be a surprise that these last couple of examples worked. But it really isn't because we are using the same technique that R uses when is does a standard evaluation of an expression. It walks through the expression using the head and tail of the quosures it finds.
+It may seem to be a surprise that these last couple of examples worked. But it really isn't because we are using the same technique that R uses when is does a standard evaluation of an expression. It walks through the expression using the head and tail of each quosures it finds.
 
-At this point we have seen the very basics of how you can use quosures. There is actually a lot more to look at. One of the things this tutorial glossed over was the role of environments in the evaluation of quosures. It's really important but that's for later tutorial.
+At this point we have seen the very basics of how you can use quosures. There is actually a lot more to look at. One of the things this tutorial glossed over was the role of environments in the evaluation of quosures. You might not be familiar with environments but they are really important for quosures, but that's for later tutorial.
 
-There are other ways to make `quosures` and use them. `make_part_number` should do error checking. `Quosures` can handle much more complicated expressions than the part number we've started with here. `Quosures` can be used to analyze an expression. But all that is for a later tutorials too.
+There are other ways to make `quosures` and use them... we've only look at a couple of the functions that R has for working with quosures. `make_part_number` should do error checking. `Quosures` can handle much more complicated expressions than the part number we've started with here. `Quosures` can also be used to analyze an expression. But all that is for a later tutorials too.
 
 Hope you found this tutorial informative and engaging,
+
 Dan
 
 
