@@ -344,9 +344,9 @@ c <- 4
 d <- 7
 make_part_number(a-b-c-d)
 ```
-Well that work as expected... Yippee!!!
+Well that works as expected... Yippee!!!
 
-Actually it works a bit better than you might think. Here set an attribute to a string value and another to a computation:
+Actually it works a bit better than you might think. Here we set an attribute to a string value and another to a computation:
 
 
 ```{r mpn3}
