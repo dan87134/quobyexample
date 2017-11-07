@@ -56,11 +56,16 @@ make_part_number <- function(expr) {
 	"21-1"
 }
 ```
+		    
+		   
 </div>
+
+
 ```{r sig-pn}
 part_type <- 21
 stock_class <- 1
 make_part_number(part_type-stock_class)
+
 ```
 
 It produces the string concatonation of values of `part_type` and  `stock_class` we were looking for.
