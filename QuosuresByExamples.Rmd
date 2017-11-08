@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 >1998 Kramer, Sienfeld Season 1, Episode 1  
 >Scrabble scene  
 
-## Credits
+
 This tutorial is brought to by the rlang functions f_text, enquo, eval_tidy, lang_head, land_tail, expr_interp, and is_lang
 
 ##Introduction
@@ -402,11 +402,13 @@ d <- 7
 make_part_number(a-b-c-b*c)
 ```
 
-It may seem to be a surprise that these last couple of examples worked. But it really isn't because we are using the same technique that R uses when is does a standard evaluation of an expression. It walks through the expression using the head and tail of each quosures it finds.
+It may seem to be a surprise that these last couple of examples worked. But it really isn't because we are using the same technique that R uses when is does a standard evaluation of an expression. It walks through the expression using the head and tail of each quosure it finds.
 
 At this point we have seen the very basics of how you can use quosures. There is actually a lot more to look at. One of the things this tutorial glossed over was the role of environments in the evaluation of quosures. You might not be familiar with environments but they are really important for quosures, but that's for later tutorial.
 
-There are other ways to make `quosures` and use them... we've only look at a couple of the functions that R has for working with quosures. `make_part_number` should do error checking. `Quosures` can handle much more complicated expressions than the part number we've started with here. `Quosures` can also be used to analyze an expression. But all that is for a later tutorials too.
+There are other ways to make `quosures` and use them... we've only look at a couple of the functions that R has for working with quosures. `Quosures` can handle much more complicated expressions than the part number we've started with here. 
+
+`Quosures` can also be used to analyze an expressions. In fact `make_part_number` doesn't do a very good job of this as is. If you experiment with it a little bit you will see that it's easy to give it a part number that is will misinterpret. But all that is for a later tutorials too.
 
 Hope you found this tutorial informative and engaging,
 
