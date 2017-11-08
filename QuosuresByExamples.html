@@ -148,7 +148,7 @@ dplyr::select(t1, first=col2, last=col3)</code></pre>
 ## 1     2     3
 ## 2     5     6
 ## 3     8     9</code></pre>
-<p><code>select</code> certainly a nicer syntax than something like:</p>
+<p><code>select</code> is certainly a nicer syntax than something like:</p>
 <pre class="r"><code>t1 &lt;- data.frame(
     col1 = 1:3,
     col2 = 2:4,
@@ -404,7 +404,7 @@ make_part_number(a-b-c-b*c)</code></pre>
 <p>It may seem to be a surprise that these last couple of examples worked. But it really isn’t because we are using the same technique that R uses when is does a standard evaluation of an expression. It walks through the expression using the head and tail of each quosure it finds.</p>
 <p>At this point we have seen the very basics of how you can use quosures. There is actually a lot more to look at. One of the things this tutorial glossed over was the role of environments in the evaluation of quosures. You might not be familiar with environments but they are really important for quosures, but that’s for later tutorial.</p>
 <p>There are other ways to make <code>quosures</code> and use them… we’ve only look at a couple of the functions that R has for working with quosures. <code>Quosures</code> can handle much more complicated expressions than the part number we’ve started with here.</p>
-<p><code>Quosures</code> can also be used to analyze an expressions. In fact <code>make_part_number</code> doesn’t do a very good job of this as is. If you experiment with it a little bit you will see that it’s easy to give it a part number that is will misinterpret. But all that is for a later tutorials too.</p>
+<p><code>Quosures</code> can also be used to analyze an expressions. In fact <code>make_part_number</code> doesn’t do a very good job of this as is. If you experiment with it a little bit you will see that it’s easy to give it a part number that it will misinterpret. But all that is for a later tutorials too.</p>
 <p>Hope you found this tutorial informative and engaging,</p>
 <p>Dan</p>
 </div>

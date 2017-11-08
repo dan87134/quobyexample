@@ -37,7 +37,7 @@ dplyr::select(t1, first=col2, last=col3)
 
 ```
 
-`select` certainly a nicer syntax than something like:
+`select` is certainly a nicer syntax than something like:
 
 ```{r subset}
 t1 <- data.frame(
@@ -408,7 +408,7 @@ At this point we have seen the very basics of how you can use quosures. There is
 
 There are other ways to make `quosures` and use them... we've only look at a couple of the functions that R has for working with quosures. `Quosures` can handle much more complicated expressions than the part number we've started with here. 
 
-`Quosures` can also be used to analyze an expressions. In fact `make_part_number` doesn't do a very good job of this as is. If you experiment with it a little bit you will see that it's easy to give it a part number that is will misinterpret. But all that is for a later tutorials too.
+`Quosures` can also be used to analyze an expressions. In fact `make_part_number` doesn't do a very good job of this as is. If you experiment with it a little bit you will see that it's easy to give it a part number that it will misinterpret. But all that is for a later tutorials too.
 
 Hope you found this tutorial informative and engaging,
 
