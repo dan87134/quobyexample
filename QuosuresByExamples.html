@@ -220,7 +220,7 @@ make_part_number_alt(a, b)</code></pre>
 <p>R provides a number of ways to quote an expression. In the tidyverse the function <code>enquo</code> is used to quote an expression which is used as an argument to a function. In this tutorial we will focus on <code>enquo</code> because we will need it for the <code>make_part_number</code> function.</p>
 <p>The <code>enquo</code> function returns an object called a <code>quosure</code>. A <code>quosure</code> is a quoted expression.</p>
 <p>The rlang package provides a number of functions that let us easily tease apart the pieces of a quosure and we’ll see them as we go though this tutorial.</p>
-<p>As an example of a simple one of these functions let’s make a quosure and use the <code>f_text</code> function to get its text value. :</p>
+<p>As an example of a simple one of these functions let’s make a quosure and use the <code>f_text</code> function to get its text value.</p>
 <pre class="r"><code># function that makes a quosure
 f1 &lt;- function(expr) {
   rlang::enquo(expr)

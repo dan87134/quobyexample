@@ -150,7 +150,7 @@ The `enquo` function returns an object called a `quosure`. A `quosure` is a quot
 
 The rlang package provides a number of functions that let us easily tease apart the pieces of a quosure and we'll see them as we go though this tutorial.
 
-As an example of a simple one of these functions let's make a quosure and use the `f_text` function to get its text value. :
+As an example of a simple one of these functions let's make a quosure and use the `f_text` function to get its text value.
 
 ```{r quosure1}
 # function that makes a quosure
